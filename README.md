@@ -1,5 +1,5 @@
 # EE 547 - Final Project：Reinforcement Learning Card Game Agent
-Repository: **ee547-project**
+
 
 ## Student Information
 - **Name:** Wanshi Cao, Ping-Hsi Hsu, Zihan Shen
