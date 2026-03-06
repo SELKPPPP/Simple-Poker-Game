@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Card Game</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                sans-serif;
+            background: #1b2838;
+            color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 960px;
+            margin: 24px;
+            background: #22313f;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 0;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background: #2e3d4f;
+            color: #f5f5f5;
+        }
+
+        .tab-btn.active {
+            background: #4e8ef7;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 320px;
+        }
+
+        label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #3c4c5f;
+            background: #1b2838;
+            color: #f5f5f5;
+        }
+
+        button {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background: #4e8ef7;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .secondary-btn {
+            background: #3c4c5f;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .pill {
+            background: #1b2838;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 13px;
+        }
+
+        .lobby-layout {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 16px;
+        }
+
+        .card-panel {
+            background: #1b2838;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .card-panel + .card-panel {
+            margin-top: 8px;
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .mode-buttons button {
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .table-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .table-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: #22313f;
+            font-size: 14px;
+        }
+
+        .status-message {
+            font-size: 14px;
+            margin-top: 8px;
+            min-height: 18px;
+        }
+
+        .status-ok {
+            color: #8de27f;
+        }
+
+        .status-error {
+            color: #ff7a7a;
+        }
+
+        /* Game view */
+        .game-layout {
+            display: grid;
+            grid-template-rows: auto auto 1fr auto;
+            gap: 12px;
+        }
+
+        .game-header-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: #3c4c5f;
+        }
+
+        .cards-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 70px;
+            height: 100px;
+            border-radius: 8px;
+            background: linear-gradient(145deg, #ffffff, #f3f3f3);
+            color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            position: relative;
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border 0.1s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+        }
+
+        .card.selected {
+            border: 2px solid #4e8ef7;
+            box-shadow: 0 0 0 2px rgba(78, 142, 247, 0.4);
+        }
+
+        .card-rank {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .card-suit {
+            font-size: 20px;
+        }
+
+        .card-corner-bottom {
+            align-self: flex-end;
+            text-align: right;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .card.red {
+            color: #c0392b;
+        }
+
+        .game-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .game-result {
+            margin-top: 8px;
+            min-height: 20px;
+        }
+
+        .opponent-section {
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px dashed rgba(255,255,255,0.1);
+        }
+
+        .muted {
+            opacity: 0.7;
+            font-size: 13px;
+        }
+
+        .small-text {
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .lobby-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h1>Card Game</h1>
+
+        <!-- Auth View -->
+        <div id="auth-view">
+            <div class="tabs">
+                <button id="tab-login" class="tab-btn active">Login</button>
+                <button id="tab-register" class="tab-btn">Register</button>
+            </div>
+
+            <form id="login-form" class="auth-form">
+                <label for="login-username">Username</label>
+                <input id="login-username" type="text" autocomplete="username" required />
+
+                <label for="login-password">Password</label>
+                <input id="login-password" type="password" autocomplete="current-password" required />
+
+                <button type="submit">Login</button>
+                <div id="login-status" class="status-message"></div>
+            </form>
+
+            <form id="register-form" class="auth-form hidden">
+                <label for="register-username">Username</label>
+                <input id="register-username" type="text" required />
+
+                <label for="register-password">Password</label>
+                <input id="register-password" type="password" required />
+
+                <button type="submit">Register</button>
+                <div id="register-status" class="status-message"></div>
+            </form>
+        </div>
+
+        <!-- Lobby View -->
+        <div id="lobby-view" class="hidden">
+            <div class="top-bar">
+                <div>
+                    <div class="pill">Logged in as <span id="display-username"></span></div>
+                    <div class="pill">Points: <span id="display-points">-</span></div>
+                </div>
+                <div style="text-align: right;">
+                    <button id="btn-logout" class="secondary-btn" style="margin-top: 6px;">Log out</button>
+                </div>
+            </div>
+
+            <div class="lobby-layout">
+                <div>
+                    <div class="card-panel">
+                        <div class="section-title">Game mode</div>
+                        <div class="mode-buttons">
+                            <button id="btn-vs-bot">Player vs. Bot</button>
+                            <button id="btn-vs-player">Player vs. Player</button>
+                        </div>
+                        <div id="lobby-status" class="status-message"></div>
+                    </div>
+
+                    <div id="pvp-panel" class="card-panel hidden">
+                        <div class="section-title">Player vs. Player lobby</div>
+
+                        <div style="margin-top: 8px;">
+                        </div>
+
+                        <div style="margin-top: 12px;">
+                            <strong>Create table</strong>
+                            <div style="margin-top: 8px; display:flex; gap:8px;">
+                                <button id="btn-create-table">Create table</button>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 12px;">
+                            <strong>Join existing table by ID</strong>
+                            <div style="margin-top: 4px; display:flex; gap:8px;">
+                                <input id="join-gameid-input" type="text" placeholder="Enter table id" style="flex:1;">
+                                <button id="btn-join-table-id">Join</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-panel">
+                    <div class="section-title">How to play</div>
+                    <ol class="small-text">
+                        <li>You start with 5 cards.</li>
+                        <li>Select cards and press <strong>Redraw selected</strong> (up to 2 times).</li>
+                        <li>Press <strong>Confirm hand</strong> to reveal the opponent and see the winner.</li>
+                        <li>After the result, return to the lobby.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game View -->
+        <div id="game-view" class="hidden">
+            <div class="game-layout">
+                <div class="game-header-line">
+                    <div>
+                        <h2 style="margin-bottom: 4px;">Game</h2>
+                        <div class="small-text muted">
+                            Mode: <span id="game-mode-label"></span> |
+                            Table: <span id="game-table-label"></span>
+                        </div>
+                        <div class="small-text muted" style="margin-top: 4px;">
+                            Round: <span id="game-round-label">1</span> /
+                            <span id="game-round-max">3</span> |
+                            Score: You
+                            <strong><span id="score-player">0</span></strong> :
+                            <strong><span id="score-opponent">0</span></strong>
+                            Opponent
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div>
+                    <div>Remaining redraws:
+                        <strong><span id="redraw-count">0</span></strong>
+                    </div>
+                    <div>
+                        <span class="badge">Player hand</span>
+                    </div>
+                    <div class="cards-row" style="margin-top: 12px" id="player-cards"></div>
+                </div>
+
+                <div class="opponent-section">
+                    <div class="game-header-line">
+                        <span class="badge">Opponent hand</span>
+                        <span class="small-text muted" id="opponent-hint">
+                        </span>
+                    </div>
+                    <div class="cards-row" id="opponent-cards"></div>
+                </div>
+
+                <div>
+                    <div class="game-controls">
+                        <button id="btn-redraw">Redraw selected</button>
+                        <button id="btn-confirm">Confirm hand</button>
+                        <button id="btn-next-round" class="secondary-btn hidden">Next round</button>
+                        <button id="btn-back-lobby" class="secondary-btn" style="margin-left: auto;">Back to lobby</button>
+                    </div>
+                    <div id="game-result" class="game-result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Socket.IO client first -->
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+bcrypt
+boto3
+flask
+flask-cors
+flask-socketio
+matplotlib
+numpy
+PyJWT

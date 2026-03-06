@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Reinforcement Learning Card Game Agent
+
+Resources:
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaBasicExecution
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+  # Lambda Function
+  TrainingTriggerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: Trigger_Training
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.12
+      Timeout: 300 
+      Code:
+        ZipFile: |
+          import urllib.request
+          import json
+
+          def lambda_handler(event, context):
+              url = "http://50.18.67.156:5001/model/train"
+              req = urllib.request.Request(url, method='POST')
+              try:
+                  with urllib.request.urlopen(req) as response:
+                      return {
+                          'statusCode': 200,
+                          'body': json.loads(response.read())
+                      }
+              except Exception as e:
+                  return {'statusCode': 500, 'body': str(e)}
+
+  ScheduledRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Trigger training daily"
+      ScheduleExpression: "cron(0 0 * * ? *)"
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt TrainingTriggerFunction.Arn
+          Id: "TargetFunctionV1"
+
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref TrainingTriggerFunction
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt ScheduledRule.Arn      

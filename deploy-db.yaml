@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Reinforcement Learning Card Game Agent
+
+Resources:
+
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: users
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: username
+          AttributeType: S
+      KeySchema:
+        - AttributeName: username
+          KeyType: HASH
+
+  CounterTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: counter
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: name
+          AttributeType: S
+      KeySchema:
+        - AttributeName: name
+          KeyType: HASH
+
+  GamesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: games
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: gameid
+          AttributeType: N
+      KeySchema:
+        - AttributeName: gameid
+          KeyType: HASH
+
+  RoundsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: rounds
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: rid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: rid
+          KeyType: HASH
+
+  DeckTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: deck
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: deckid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: deckid
+          KeyType: HASH
+
+  TrainingQueueTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: training_queue
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: gameid
+          AttributeType: N
+      KeySchema:
+        - AttributeName: gameid
+          KeyType: HASH
