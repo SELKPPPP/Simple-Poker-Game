@@ -1,0 +1,19 @@
+# Phase 3 default training config.
+# All hyperparams declared explicitly. Override via CLI flags.
+
+num_iterations: 100000
+seed: 42
+
+# Logging / checkpointing cadence (every N iterations)
+log_every: 1000
+checkpoint_every: 10000
+eval_every: 10000
+
+# Sampled BR exploitability params (cheap rollout estimate)
+# True BR is intractable here; this is a 1-ply lookahead lower bound.
+eval_num_games: 200
+eval_lookahead_samples: 5
+
+# Output paths (relative to repo root)
+checkpoint_dir: cfr/checkpoints
+log_dir: cfr/logs

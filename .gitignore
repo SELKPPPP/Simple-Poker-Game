@@ -1,2 +1,4 @@
 __pycache__/
 password.txt
+cfr/checkpoints/
+cfr/logs/
