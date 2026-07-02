@@ -48,7 +48,7 @@ def main() -> None:
 
     if args.head_to_head:
         from cfr.eval.cfr_agent import CFRAgent
-        cfr = CFRAgent.from_checkpoint(args.checkpoint, seed=0)
+        cfr = CFRAgent.from_checkpoint(args.checkpoint)
         ql = QTableAgent()
         r = play_match(cfr, ql, num_games=args.num_games, seed=args.seed)
         print(f"cfr vs qlearning  avg_u={r['a_avg_utility']:+.3f}  "
@@ -59,7 +59,7 @@ def main() -> None:
         agent = QTableAgent()
     else:
         from cfr.eval.cfr_agent import CFRAgent
-        agent = CFRAgent.from_checkpoint(args.checkpoint, seed=0)
+        agent = CFRAgent.from_checkpoint(args.checkpoint)
     eval_vs_baselines(agent, args.num_games, args.seed)
 
 

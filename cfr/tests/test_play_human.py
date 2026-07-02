@@ -52,14 +52,16 @@ def test_prompt_redraw_rejects_over_budget(monkeypatch):
 
 
 def test_run_match_completes_with_always_play(monkeypatch, capsys):
-    """Feed 'p' (play) for any FOLD prompt, 'stop' for any redraw prompt.
-    Game must terminate without crashing.
+    """Answer 'p' to FOLD prompts, 'stop' to redraw prompts (prompt-aware,
+    so the schedule doesn't depend on how the AI plays). Game must terminate
+    without crashing.
     """
-    # Generous buffer of responses — game won't ask more than this
-    feeder = _make_input_feeder(["p"] * 6 + ["stop"] * 50)
-    monkeypatch.setattr(builtins, "input", feeder)
+    def fake_input(prompt=""):
+        return "p" if "[p]lay" in prompt else "stop"
 
-    cfr = CFRAgent(RegretTable(), seed=0)
+    monkeypatch.setattr(builtins, "input", fake_input)
+
+    cfr = CFRAgent(RegretTable())
     run_match(cfr, human_seat=0, game_seed=42)
 
     out = capsys.readouterr().out
