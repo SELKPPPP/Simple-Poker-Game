@@ -129,6 +129,20 @@ def test_one_decision_per_round_then_stop(tmp_path):
         assert agent.act(game, p) == REDRAW_ACTION_STOP
 
 
+# ============ rules-copy guard ============
+
+def test_poker_rules_copy_stays_identical():
+    """legacy_state's bit-for-bit q_table compatibility depends on
+    cfr/env/poker_rules.py being an exact copy of the backend original.
+    If this fails, a rules fix landed in one copy only — sync them.
+    """
+    import pathlib
+    root = pathlib.Path(__file__).resolve().parents[2]
+    ours = (root / "cfr" / "env" / "poker_rules.py").read_bytes()
+    theirs = (root / "backend" / "model_lib" / "poker_rules.py").read_bytes()
+    assert ours == theirs
+
+
 # ============ real q_table smoke ============
 
 def test_real_q_table_plays_full_match():

@@ -45,7 +45,11 @@ def main() -> None:
         ckpt = load_checkpoint(args.resume)
         table = ckpt["regret_table"]
         start_iter = ckpt["iter"]
-        # Honor original seed so the rng schedule is consistent on resume.
+        # Honor original seed. Note: resume replays only the per-iteration
+        # game-seed schedule (trainer advances rng once per skipped iter),
+        # not the exact rng state — trajectories after resume differ from an
+        # uninterrupted run. Harmless for CFR convergence, but resumed runs
+        # are not bit-identical to continuous ones.
         config["seed"] = ckpt["seed"]
         print(f"resumed from iter={start_iter} ({args.resume})")
 

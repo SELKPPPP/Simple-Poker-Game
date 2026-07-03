@@ -14,13 +14,26 @@ from cfr.train.checkpoint import load_checkpoint
 
 
 def uniform_fraction(table) -> tuple:
+    """Count multi-action info sets whose NORMALIZED average strategy is
+    within 1pp of uniform (zero-mass sets play uniform too).
+
+    Normalizing first keeps the check invariant to the raw cum-strat scale,
+    which grew from O(t) to O(t^2) when Linear CFR weighting landed. Measured
+    impact vs the old raw 1e-3 check: 93.1%->93.3% (old 1M run),
+    51.5%->52.0% (v4 1M run) — conclusions unchanged, definition now sound.
+    """
     uniform = total = 0
     for cs in table._cumulative_strategy.values():
         if len(cs) <= 1:
             continue
         total += 1
         vs = list(cs.values())
-        if max(vs) - min(vs) < 1e-3:
+        s = sum(vs)
+        if s <= 0:
+            uniform += 1
+            continue
+        p = [v / s for v in vs]
+        if max(p) - min(p) < 0.01:
             uniform += 1
     return uniform, total
 

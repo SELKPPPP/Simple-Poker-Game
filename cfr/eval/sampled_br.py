@@ -15,6 +15,11 @@ training progress: if even this loose bound drops, sigma is becoming harder
 to exploit.
 
 exploit_sampled(sigma) = BR_0_sampled + BR_1_sampled
+
+NOTE: this measures the raw SAMPLED average strategy. The deployed CFRAgent
+plays purified argmax + never-fold (see eval/cfr_agent.py), so the deployed
+policy's exploitability differs from this number. Use it as a training-
+progress signal only; judge deployed strength by eval_agents match results.
 """
 
 import copy

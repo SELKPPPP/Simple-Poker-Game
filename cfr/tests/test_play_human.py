@@ -56,7 +56,13 @@ def test_run_match_completes_with_always_play(monkeypatch, capsys):
     so the schedule doesn't depend on how the AI plays). Game must terminate
     without crashing.
     """
+    calls = 0
+
     def fake_input(prompt=""):
+        nonlocal calls
+        calls += 1
+        if calls > 200:  # a full game needs far fewer prompts -> loop bug
+            raise RuntimeError(f"input loop did not terminate; prompt: {prompt!r}")
         return "p" if "[p]lay" in prompt else "stop"
 
     monkeypatch.setattr(builtins, "input", fake_input)
